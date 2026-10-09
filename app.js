@@ -12,20 +12,28 @@ let config;
 
 try {
   config = yaml.load(
-    fs.readFileSync(path.join(__dirname, CONFIG), 'utf8')
+      fs.readFileSync(path.join(__dirname, CONFIG), 'utf8')
   );
 } catch (error) {
   console.error('Error reading or parsing config:', error);
   process.exit(1);
 }
 
+// Middleware to parse JSON bodies
 app.use(express.json());
+
+// Tailwind CSS
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
 
 function checkRoute(req, res, next) {
   const route = req.params.route;
 
-  if (!config.routes.includes(route)) {
-    return res.status(404).json({
+  if (!config.routes || !config.routes.includes(route)) {
+    return res.status(404).render('error', {
+      title: '404 Not Found',
       error: `Route ${route} not found`
     });
   }
@@ -34,14 +42,21 @@ function checkRoute(req, res, next) {
 }
 
 app.get('/', (req, res) => {
-  res.send(`Configured routes: ${config.routes}`);
+  res.render('index', {
+    title: 'Configured Routes',
+    routes: config.routes
+  });
 });
 
 app.get('/:route', checkRoute, (req, res) => {
   const route = req.params.route;
   const data = config[route] || [];
 
-  res.json(data);
+  res.render('route', {
+    title: route,
+    route,
+    data
+  });
 });
 
 app.get('/:route/:id', checkRoute, (req, res) => {
@@ -52,12 +67,17 @@ app.get('/:route/:id', checkRoute, (req, res) => {
   const record = data.find(item => item.id == id);
 
   if (!record) {
-    return res.status(404).json({
+    return res.status(404).render('error', {
+      title: '404 Not Found',
       error: `Record with ID ${id} not found in ${route}`
     });
   }
 
-  res.json(record);
+  res.render('detail', {
+    title: `${route} #${id}`,
+    route,
+    record
+  });
 });
 
 const server = app.listen(PORT, () => {
