@@ -5,6 +5,12 @@
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
     "tailwindcss": "^4.3.3"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/stylesheets/style.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/stylesheets/style.css --watch",
+    "start": "node app.js"
   }
 }
