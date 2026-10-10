@@ -28,3 +28,5 @@ desktop.ini
 # Coverage / build output
 coverage/
 dist/
+
+./todo.txt
