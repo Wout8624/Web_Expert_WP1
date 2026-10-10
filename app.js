@@ -44,7 +44,7 @@ function checkRoute(req, res, next) {
 app.get('/', (req, res) => {
   res.render('index', {
     title: 'Configured Routes',
-    routes: config.routes
+    routes: config.routes.map(r => ({ name: r, count: (config[r] || []).length }))
   });
 });
 
