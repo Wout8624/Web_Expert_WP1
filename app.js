@@ -50,12 +50,46 @@ app.get('/', (req, res) => {
     routes: config.routes.map(r => ({ name: r, count: (config[r] || []).length }))
   });
 });
+
+// ----------------------------
+// |  Embed relations helper  |
+// ----------------------------
+function embedRelation(route, record, embed) {
+  const forward = (config.relationships?.[route] || [])
+      .find(rel => rel.relatedRoute === embed);
+
+  if (forward) {
+    const ids = record[forward.foreignKey] || [];
+
+    const related = (config[embed] || []).filter(item => ids.includes(item.id));
+
+    return { ...record, [embed]: related };
+  }
+
+  const reverse = (config.relationships?.[embed] || [])
+      .find(rel => rel.relatedRoute === route);
+
+  if (reverse) {
+    const related = (config[embed] || [])
+        .filter(item => (item[reverse.foreignKey] || []).includes(record.id));
+
+    return { ...record, [embed]: related };
+  }
+
+  return record;
+}
+
 // ----------------------------
 // |   get all of a route     |
 // ----------------------------
 app.get('/:route', checkRoute, (req, res) => {
   const route = req.params.route;
-  const data = config[route] || [];
+  const embed = req.query._embed;
+  let data = config[route] || [];
+
+  if (embed) {
+    data = data.map(item => embedRelation(route, item, embed));
+  }
 
   res.json({
     title: route,
@@ -64,27 +98,37 @@ app.get('/:route', checkRoute, (req, res) => {
   });
 });
 
+// ----------------------
+// |     Get By Id      |
+// ----------------------
 app.get('/:route/:id', checkRoute, (req, res) => {
   const route = req.params.route;
-  const id = req.params.id;
+  const id = Number(req.params.id);
   const data = config[route] || [];
 
-  const record = data.find(item => item.id == id);
+  let record = data.find(item => item.id === id);
 
   if (!record) {
-    return res.status(404).render('error', {
+    return res.status(404).json({
       title: '404 Not Found',
       error: `Record with ID ${id} not found in ${route}`
     });
   }
 
-  res.render('detail', {
+  if (req.query._embed) {
+    record = embedRelation(route, record, req.query._embed);
+  }
+
+  res.json({
     title: `${route} #${id}`,
     route,
     record
   });
 });
 
+// ----------------------
+// |   Setup server     |
+// ----------------------
 const server = app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 }).on('error', (err) => {
