@@ -2,19 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
-<h1>Welcome!</h1>
-    <br>
-    <hr class="w-64">
-    <br>
-    <h2>Configured Routes</h2>
-    <ul>
-        {{#each routes}}
-            <li><a href="/{{name}}">/{{name}}</a> - {{count}} items</li>
-        {{/each}}
-    </ul>
+<body class="min-h-screen bg-carbon-black-950 text-carbon-black-200 antialiased">
+<div class="pointer-events-none fixed inset-0 bg-gradient-to-br from-rich-mahogany-800 via-carbon-black-950 to-carbon-black-950"></div>
+<div class="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,var(--color-rich-mahogany-700)_0%,transparent_60%)] opacity-60"></div>
+<div class="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_right,var(--color-rich-mahogany-900)_0%,transparent_55%)]"></div>
+
+<main class="relative mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
+    <header class="text-center">
+        <span class="inline-flex items-center gap-2 rounded-full border border-rich-mahogany-700 bg-carbon-black-900/60 px-3 py-1 text-xs font-medium text-rich-mahogany-200 shadow-sm backdrop-blur">
+            <span class="h-2 w-2 rounded-full bg-autumn-ember-500"></span>
+            API is running
+        </span>
+        <h1 class="mt-6 text-4xl font-bold tracking-tight text-soft-linen-50 sm:text-5xl">
+            Welcome!
+        </h1>
+        <p class="mx-auto mt-4 max-w-xl text-lg text-carbon-black-300">
+            Browse the routes defined in your configuration. Each one serves its records as JSON.
+        </p>
+    </header>
+
+    <section class="mt-16">
+        <div class="mb-4 flex items-baseline justify-between">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-rich-mahogany-300">Configured Routes</h2>
+            <span class="text-sm text-carbon-black-400">{{routes.length}} total</span>
+        </div>
+
+        <ul class="grid gap-4 sm:grid-cols-2">
+            {{#each routes}}
+                <li>
+                    <a href="/{{name}}"
+                       class="group flex items-center justify-between rounded-xl border border-carbon-black-800 bg-carbon-black-900/70 p-5 shadow-lg shadow-black/30 backdrop-blur transition hover:-translate-y-0.5 hover:border-autumn-ember-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
+                        <div class="flex items-center gap-4">
+                            <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-rich-mahogany-900 font-mono text-lg font-semibold text-rich-mahogany-300">/</div>
+                            <div>
+                                <p class="font-mono text-base font-semibold text-soft-linen-50">/{{name}}</p>
+                                <p class="text-sm text-carbon-black-400">{{count}} items</p>
+                            </div>
+                        </div>
+                        <svg class="h-5 w-5 text-carbon-black-600 transition group-hover:translate-x-1 group-hover:text-autumn-ember-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </li>
+            {{else}}
+                <li class="col-span-full rounded-xl border border-dashed border-carbon-black-700 p-8 text-center text-carbon-black-400">
+                    No routes configured yet. Add some to <code class="font-mono text-carbon-black-200">config.yaml</code>.
+                </li>
+            {{/each}}
+        </ul>
+    </section>
+
+    <footer class="mt-16 text-center text-sm text-carbon-black-500">
+        Tip: open <code class="rounded bg-carbon-black-800 px-1.5 py-0.5 font-mono text-carbon-black-200">/&lt;route&gt;/&lt;id&gt;</code> to view a single record.
+    </footer>
+</main>
 </body>
 </html>

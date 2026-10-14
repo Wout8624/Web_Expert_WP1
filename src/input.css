@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+@theme {
+  --color-carbon-black-50: #f3f2f1;
+  --color-carbon-black-100: #e7e5e4;
+  --color-carbon-black-200: #cfcbc9;
+  --color-carbon-black-300: #b7b1ae;
+  --color-carbon-black-400: #9f9793;
+  --color-carbon-black-500: #877d78;
+  --color-carbon-black-600: #6c6460;
+  --color-carbon-black-700: #514b48;
+  --color-carbon-black-800: #363230;
+  --color-carbon-black-900: #1b1918;
+  --color-carbon-black-950: #131111;
+
+  --color-rich-mahogany-50: #fbeaea;
+  --color-rich-mahogany-100: #f7d4d5;
+  --color-rich-mahogany-200: #efa9ac;
+  --color-rich-mahogany-300: #e77e82;
+  --color-rich-mahogany-400: #de5458;
+  --color-rich-mahogany-500: #d6292f;
+  --color-rich-mahogany-600: #ab2125;
+  --color-rich-mahogany-700: #81181c;
+  --color-rich-mahogany-800: #561013;
+  --color-rich-mahogany-900: #2b0809;
+  --color-rich-mahogany-950: #1e0607;
+
+  --color-autumn-ember-50: #fdf1e8;
+  --color-autumn-ember-100: #fae3d1;
+  --color-autumn-ember-200: #f6c6a2;
+  --color-autumn-ember-300: #f1aa74;
+  --color-autumn-ember-400: #ed8e45;
+  --color-autumn-ember-500: #e87217;
+  --color-autumn-ember-600: #ba5b12;
+  --color-autumn-ember-700: #8b440e;
+  --color-autumn-ember-800: #5d2d09;
+  --color-autumn-ember-900: #2e1705;
+  --color-autumn-ember-950: #201003;
+
+  --color-soft-linen-50: #f8f4ed;
+  --color-soft-linen-100: #f1e8da;
+  --color-soft-linen-200: #e2d2b6;
+  --color-soft-linen-300: #d4bb91;
+  --color-soft-linen-400: #c6a56c;
+  --color-soft-linen-500: #b88e47;
+  --color-soft-linen-600: #937239;
+  --color-soft-linen-700: #6e552b;
+  --color-soft-linen-800: #49391d;
+  --color-soft-linen-900: #251c0e;
+  --color-soft-linen-950: #1a140a;
+
+  --color-golden-earth-50: #f8f3ec;
+  --color-golden-earth-100: #f1e6da;
+  --color-golden-earth-200: #e4ceb4;
+  --color-golden-earth-300: #d6b58f;
+  --color-golden-earth-400: #c99c69;
+  --color-golden-earth-500: #bb8344;
+  --color-golden-earth-600: #966936;
+  --color-golden-earth-700: #704f29;
+  --color-golden-earth-800: #4b351b;
+  --color-golden-earth-900: #251a0e;
+  --color-golden-earth-950: #1a1209;
+}
