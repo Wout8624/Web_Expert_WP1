@@ -21,7 +21,7 @@
             Welcome!
         </h1>
         <p class="mx-auto mt-4 max-w-xl text-lg text-soft-linen-300">
-            Browse the routes defined in your configuration. Each one serves its records as JSON.
+            Browse the routes defined in your configuration. Run a request below to see its JSON response.
         </p>
         <div class="mx-auto mt-10 h-px w-40 bg-gradient-to-r from-transparent via-soft-linen-500 to-transparent"></div>
     </header>
@@ -34,20 +34,52 @@
 
         <ul class="grid gap-4 sm:grid-cols-2">
             {{#each routes}}
-                <li>
-                    <a href="/{{name}}"
-                       class="group flex items-center justify-between rounded-xl border border-soft-linen-800/60 bg-carbon-black-900/70 p-5 shadow-lg shadow-black/30 backdrop-blur transition hover:-translate-y-0.5 hover:border-soft-linen-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
-                        <div class="flex items-center gap-4">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-soft-linen-100 font-mono text-lg font-semibold text-rich-mahogany-700">/</div>
-                            <div>
-                                <p class="font-mono text-base font-semibold text-soft-linen-50">/{{name}}</p>
-                                <p class="text-sm text-soft-linen-400">{{count}} items</p>
-                            </div>
+                <li class="flex flex-col gap-5 rounded-xl border border-soft-linen-800/60 bg-carbon-black-900/70 p-5 shadow-lg shadow-black/30 backdrop-blur">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-soft-linen-100 font-mono text-lg font-semibold text-rich-mahogany-700">/</div>
+                        <div>
+                            <p class="font-mono text-base font-semibold text-soft-linen-50">/{{name}}</p>
+                            <p class="text-sm text-soft-linen-400">{{count}} items</p>
                         </div>
-                        <svg class="h-5 w-5 text-carbon-black-600 transition group-hover:translate-x-1 group-hover:text-soft-linen-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
+                    </div>
+
+                    <div>
+                        <label for="embed-{{name}}" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Embed</label>
+                        <select id="embed-{{name}}" data-route="{{name}}"
+                                class="embed-select w-full rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                        </select>
+                    </div>
+
+                    <div>
+                        <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Get all</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" data-route="{{name}}"
+                                    class="run-all rounded-lg bg-soft-linen-100 px-3 py-1.5 text-sm font-semibold text-carbon-black-900 transition hover:bg-soft-linen-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
+                                Run
+                            </button>
+                            <button type="button" data-route="{{name}}" data-embed="true"
+                                    class="run-all rounded-lg border border-rich-mahogany-500 bg-rich-mahogany-700/60 px-3 py-1.5 text-sm font-semibold text-soft-linen-50 transition hover:bg-rich-mahogany-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-soft-linen-300">
+                                Run embedded
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="id-{{name}}" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Get by id</label>
+                        <div class="flex flex-wrap gap-2">
+                            <select id="id-{{name}}" data-route="{{name}}"
+                                    class="id-select rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                            </select>
+                            <button type="button" data-route="{{name}}"
+                                    class="run-id rounded-lg bg-soft-linen-100 px-3 py-1.5 text-sm font-semibold text-carbon-black-900 transition hover:bg-soft-linen-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
+                                Run
+                            </button>
+                            <button type="button" data-route="{{name}}" data-embed="true"
+                                    class="run-id rounded-lg border border-rich-mahogany-500 bg-rich-mahogany-700/60 px-3 py-1.5 text-sm font-semibold text-soft-linen-50 transition hover:bg-rich-mahogany-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-soft-linen-300">
+                                Run embedded
+                            </button>
+                        </div>
+                    </div>
                 </li>
             {{else}}
                 <li class="col-span-full rounded-xl border border-dashed border-soft-linen-800 p-8 text-center text-carbon-black-400">
@@ -57,9 +89,98 @@
         </ul>
     </section>
 
+    <section id="result" class="mt-10 hidden">
+        <div class="mb-4 flex items-baseline justify-between gap-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-soft-linen-400">Response</h2>
+            <a id="result-url" href="#" target="_blank" class="truncate font-mono text-sm text-soft-linen-300 underline decoration-soft-linen-700 underline-offset-4 hover:text-soft-linen-100"></a>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-soft-linen-800/60 bg-carbon-black-950/80 shadow-lg shadow-black/30">
+            <div class="flex items-center gap-2 border-b border-soft-linen-900 px-4 py-2 text-xs">
+                <span class="rounded bg-soft-linen-900 px-1.5 py-0.5 font-mono font-semibold text-soft-linen-200">GET</span>
+                <span id="result-status" class="font-mono"></span>
+            </div>
+            <pre id="result-body" class="max-h-[32rem] overflow-auto p-4 font-mono text-sm leading-relaxed text-soft-linen-100"></pre>
+        </div>
+    </section>
+
     <footer class="mt-16 text-center text-sm text-soft-linen-500">
-        Tip: open <code class="rounded bg-soft-linen-900 px-1.5 py-0.5 font-mono text-soft-linen-200">/&lt;route&gt;/&lt;id&gt;</code> to view a single record.
+        Tip: add <code class="rounded bg-soft-linen-900 px-1.5 py-0.5 font-mono text-soft-linen-200">?_embed=&lt;route&gt;</code> to any request to include related records.
     </footer>
 </main>
+
+<script>
+    const result = document.getElementById('result');
+    const resultUrl = document.getElementById('result-url');
+    const resultStatus = document.getElementById('result-status');
+    const resultBody = document.getElementById('result-body');
+
+    async function run(url) {
+        result.classList.remove('hidden');
+        resultUrl.textContent = url;
+        resultUrl.href = url;
+        resultStatus.textContent = 'Loading…';
+        resultStatus.className = 'font-mono text-soft-linen-400';
+        resultBody.textContent = '';
+
+        try {
+            const res = await fetch(url);
+            const text = await res.text();
+            resultStatus.textContent = `${res.status} ${res.statusText}`;
+            resultStatus.className = `font-mono ${res.ok ? 'text-soft-linen-200' : 'text-rich-mahogany-300'}`;
+            try {
+                resultBody.textContent = JSON.stringify(JSON.parse(text), null, 2);
+            } catch {
+                resultBody.textContent = text;
+            }
+        } catch (error) {
+            resultStatus.textContent = 'Request failed';
+            resultStatus.className = 'font-mono text-rich-mahogany-300';
+            resultBody.textContent = error.message;
+        }
+
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    const routeNames = [...document.querySelectorAll('.embed-select')].map(select => select.dataset.route);
+
+    // Embed choices: every other configured route
+    document.querySelectorAll('.embed-select').forEach(select => {
+        routeNames
+            .filter(name => name !== select.dataset.route)
+            .forEach(name => select.add(new Option(name, name)));
+    });
+
+    // Id choices: loaded from the existing GET /:route endpoint
+    document.querySelectorAll('.id-select').forEach(async select => {
+        try {
+            const res = await fetch(`/${select.dataset.route}`);
+            const { data } = await res.json();
+            data.forEach(item => select.add(new Option(`#${item.id}`, item.id)));
+        } catch {
+            select.add(new Option('n/a', ''));
+        }
+    });
+
+    function buildUrl(button, withId) {
+        const { route, embed } = button.dataset;
+        let url = `/${route}`;
+
+        if (withId) {
+            url += `/${encodeURIComponent(document.getElementById(`id-${route}`).value)}`;
+        }
+        if (embed) {
+            url += `?_embed=${encodeURIComponent(document.getElementById(`embed-${route}`).value)}`;
+        }
+        return url;
+    }
+
+    document.querySelectorAll('.run-all').forEach(button => {
+        button.addEventListener('click', () => run(buildUrl(button, false)));
+    });
+
+    document.querySelectorAll('.run-id').forEach(button => {
+        button.addEventListener('click', () => run(buildUrl(button, true)));
+    });
+</script>
 </body>
 </html>
