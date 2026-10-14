@@ -41,18 +41,23 @@ function checkRoute(req, res, next) {
   next();
 }
 
+// ----------------------
+// |   Landing page     |
+// ----------------------
 app.get('/', (req, res) => {
   res.render('index', {
     title: 'Configured Routes',
     routes: config.routes.map(r => ({ name: r, count: (config[r] || []).length }))
   });
 });
-
+// ----------------------------
+// |   get all of a route     |
+// ----------------------------
 app.get('/:route', checkRoute, (req, res) => {
   const route = req.params.route;
   const data = config[route] || [];
 
-  res.render('route', {
+  res.json({
     title: route,
     route,
     data
