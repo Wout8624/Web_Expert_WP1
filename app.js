@@ -172,7 +172,8 @@ app.post('/:route', checkRoute, (req, res) => {
     return res.status(400).json({ error: 'Invalid links', problems });
   }
 
-  const record = { ...newRecord, id: nextId(route) };
+  const { id, ...fields } = newRecord;
+  const record = { id: nextId(route), ...fields };
   config[route] = config[route] || [];
   config[route].push(record);
   save();

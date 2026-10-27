@@ -12,10 +12,12 @@ persons:
     name: Sofie
   - id: 3
     name: Tim
-  - name: WoutOS
-    id: 4
-  - name: Seppe
-    id: 5
+  - id: 4
+    name: WoutOS
+  - id: 5
+    name: Seppe
+  - id: 6
+    name: Living Failure
 pets:
   - id: 1
     type: dog
@@ -28,8 +30,8 @@ pets:
     ownerIds:
       - 1
       - 2
-  - type: Python
+  - id: 3
+    type: Python
     name: Hector the Long
     ownerIds:
       - 4
-    id: 3
