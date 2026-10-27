@@ -6,31 +6,31 @@ relationships:
     - relatedRoute: persons
       foreignKey: ownerIds
 persons:
-  - id: 1
+  - id: 3346702c-8e36-48f5-941c-86ae2a1ef4cc
     name: Jan
-  - id: 2
+  - id: 7e90a898-13bc-4ba2-a10d-2755340d8b8e
     name: Sofie
-  - id: 3
+  - id: e4525519-d63c-4c97-a895-c7dc27594de2
     name: Tim
-  - id: 4
+  - id: cf8f059f-7ed9-4bf0-80e0-d37928e3426e
     name: Wout Maesen
-  - id: 5
+  - id: 629aacd8-6303-4da3-a6d0-1cc67c9e1d09
     name: Seppe
 pets:
-  - id: 1
+  - id: da9dab31-02ec-4d2f-b7e6-a33e4690b142
     type: dog
     name: Jimmy
     ownerIds:
-      - 2
-  - id: 2
+      - 7e90a898-13bc-4ba2-a10d-2755340d8b8e
+  - id: eb7e8717-17d0-4f5a-8a75-25cfe8dc8547
     type: cat
     name: Duvel
     ownerIds:
-      - 1
-      - 2
-  - id: 3
+      - 3346702c-8e36-48f5-941c-86ae2a1ef4cc
+      - 7e90a898-13bc-4ba2-a10d-2755340d8b8e
+  - id: f0ac48de-e00a-4d05-8c1f-ceda229cd92d
     type: Python
     name: Hector the Life-Long
     ownerIds:
-      - 4
-      - 5
+      - cf8f059f-7ed9-4bf0-80e0-d37928e3426e
+      - 629aacd8-6303-4da3-a6d0-1cc67c9e1d09

@@ -208,10 +208,12 @@
             const { data } = await res.json();
             recordsByRoute[route] = data;
 
+            // Show the name, but keep the UUID as the option's value
             data.forEach(item => {
-                idSelect.add(new Option(`#${item.id}`, item.id));
-                putSelect.add(new Option(`#${item.id}`, item.id));
-                deleteSelect.add(new Option(`#${item.id}`, item.id));
+                const label = item.name || item.id;
+                idSelect.add(new Option(label, item.id));
+                putSelect.add(new Option(label, item.id));
+                deleteSelect.add(new Option(label, item.id));
             });
 
             // Pre-fill the POST and PUT bodies with the first record
@@ -284,10 +286,12 @@
     document.querySelectorAll('.run-delete').forEach(button => {
         button.addEventListener('click', () => {
             const { route } = button.dataset;
-            const id = document.getElementById(`delete-id-${route}`).value;
+            const select = document.getElementById(`delete-id-${route}`);
+            const id = select.value;
+            const name = select.selectedOptions[0]?.text;
 
-            // Deleting writes to config.yaml, so ask first
-            if (!confirm(`Delete ${route} #${id}?`)) return;
+            // Deleting changes the data, so ask first
+            if (!confirm(`Delete ${name} from ${route}?`)) return;
 
             run(`/${route}/${encodeURIComponent(id)}`, { method: 'DELETE' });
         });
