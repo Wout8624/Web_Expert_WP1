@@ -178,8 +178,36 @@ app.post('/:route', checkRoute, (req, res) => {
   config[route].push(record);
   save();
 
-  // 4. Send the new record back (same shape as "get by id")
   res.status(201).json({ title: `${route} #${record.id}`, route, record });
+});
+
+// ----------------------
+// |       Put          |
+// ----------------------
+app.put('/:route/:id', checkRoute, (req, res) => {
+  const route = req.params.route;
+  const id = Number(req.params.id);
+  const updatedRecord = req.body;
+
+  // does the updated record exist ?
+  const index = (config[route] || []).findIndex(item => item.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: `Record with ID ${id} not found in ${route}` });
+  }
+
+  // check if foreign relations are in order
+  const problems = findUnknownIds(route, updatedRecord);
+  if (problems.length > 0) {
+    return res.status(400).json({ error: 'Invalid links', problems });
+  }
+
+  // update (keep the id from the URL, ignore any id in the body)
+  const { id: _ignoredId, ...fields } = updatedRecord;
+  const record = { id, ...fields };
+  config[route][index] = record;
+  save();
+
+  res.json({ title: `${route} #${id}`, route, record });
 });
 
 // ----------------------

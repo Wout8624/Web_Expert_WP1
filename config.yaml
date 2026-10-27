@@ -13,7 +13,7 @@ persons:
   - id: 3
     name: Tim
   - id: 4
-    name: WoutOS
+    name: Wout Maesen
   - id: 5
     name: Seppe
   - id: 6
@@ -32,6 +32,7 @@ pets:
       - 2
   - id: 3
     type: Python
-    name: Hector the Long
+    name: Hector the Life-Long
     ownerIds:
       - 4
+      - 5

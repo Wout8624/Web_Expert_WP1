@@ -90,6 +90,19 @@
                             Run
                         </button>
                     </div>
+
+                    <div>
+                        <label for="put-id-{{name}}" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Update (PUT)</label>
+                        <select id="put-id-{{name}}" data-route="{{name}}"
+                                class="put-id-select mb-2 rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                        </select>
+                        <textarea id="put-body-{{name}}" data-route="{{name}}" rows="5" spellcheck="false"
+                                  class="w-full rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">{}</textarea>
+                        <button type="button" data-route="{{name}}"
+                                class="run-put mt-2 rounded-lg bg-soft-linen-100 px-3 py-1.5 text-sm font-semibold text-carbon-black-900 transition hover:bg-soft-linen-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
+                            Run
+                        </button>
+                    </div>
                 </li>
             {{else}}
                 <li class="col-span-full rounded-xl border border-dashed border-soft-linen-800 p-8 text-center text-carbon-black-400">
@@ -162,21 +175,50 @@
             .forEach(name => select.add(new Option(name, name)));
     });
 
-    // Id choices: loaded from the existing GET /:route endpoint
-    document.querySelectorAll('.id-select').forEach(async select => {
-        try {
-            const res = await fetch(`/${select.dataset.route}`);
-            const { data } = await res.json();
-            data.forEach(item => select.add(new Option(`#${item.id}`, item.id)));
+    // Records per route, so the PUT body can be filled with the chosen record
+    const recordsByRoute = {};
 
-            // Pre-fill the POST body with the fields of an existing record (minus its id)
+    // Shows a record's fields (minus its id) as JSON in a textarea
+    function fillBody(textarea, record) {
+        const { id, ...fields } = record;
+        textarea.value = JSON.stringify(fields, null, 2);
+    }
+
+    // Id choices: loaded from the existing GET /:route endpoint
+    routeNames.forEach(async route => {
+        const idSelect = document.getElementById(`id-${route}`);
+        const putSelect = document.getElementById(`put-id-${route}`);
+
+        try {
+            const res = await fetch(`/${route}`);
+            const { data } = await res.json();
+            recordsByRoute[route] = data;
+
+            data.forEach(item => {
+                idSelect.add(new Option(`#${item.id}`, item.id));
+                putSelect.add(new Option(`#${item.id}`, item.id));
+            });
+
+            // Pre-fill the POST and PUT bodies with the first record
             if (data.length > 0) {
-                const { id, ...template } = data[0];
-                document.getElementById(`body-${select.dataset.route}`).value = JSON.stringify(template, null, 2);
+                fillBody(document.getElementById(`body-${route}`), data[0]);
+                fillBody(document.getElementById(`put-body-${route}`), data[0]);
             }
         } catch {
-            select.add(new Option('n/a', ''));
+            idSelect.add(new Option('n/a', ''));
+            putSelect.add(new Option('n/a', ''));
         }
+    });
+
+    // Picking another id for PUT loads that record into the textarea
+    document.querySelectorAll('.put-id-select').forEach(select => {
+        select.addEventListener('change', () => {
+            const { route } = select.dataset;
+            const record = (recordsByRoute[route] || []).find(item => String(item.id) === select.value);
+            if (record) {
+                fillBody(document.getElementById(`put-body-${route}`), record);
+            }
+        });
     });
 
     function buildUrl(button, withId) {
@@ -207,6 +249,18 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: document.getElementById(`body-${route}`).value
+            });
+        });
+    });
+
+    document.querySelectorAll('.run-put').forEach(button => {
+        button.addEventListener('click', () => {
+            const { route } = button.dataset;
+            const id = document.getElementById(`put-id-${route}`).value;
+            run(`/${route}/${encodeURIComponent(id)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: document.getElementById(`put-body-${route}`).value
             });
         });
     });
