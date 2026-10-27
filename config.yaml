@@ -16,8 +16,6 @@ persons:
     name: Wout Maesen
   - id: 5
     name: Seppe
-  - id: 6
-    name: Living Failure
 pets:
   - id: 1
     type: dog

@@ -201,13 +201,40 @@ app.put('/:route/:id', checkRoute, (req, res) => {
     return res.status(400).json({ error: 'Invalid links', problems });
   }
 
-  // update (keep the id from the URL, ignore any id in the body)
+  // update
   const { id: _ignoredId, ...fields } = updatedRecord;
   const record = { id, ...fields };
   config[route][index] = record;
   save();
 
   res.json({ title: `${route} #${id}`, route, record });
+});
+
+// ----------------------
+// |       delete          |
+// ----------------------
+app.delete('/:route/:id', checkRoute, (req, res) => {
+  const route = req.params.route;
+  const id = Number(req.params.id);
+
+  // does the record exist ?
+  const index = (config[route] || []).findIndex(item => item.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: `Record with ID ${id} not found in ${route}` });
+  }
+
+  const deleted = config[route][index];
+  config[route] = config[route].filter(item => item.id !== id);
+
+  // If a person is deleted, remove them as owner from every pet
+  if (route === 'persons') {
+    for (const pet of config.pets) {
+      pet.ownerIds = (pet.ownerIds || []).filter(ownerId => ownerId !== id);
+    }
+  }
+
+  save();
+  res.json({ title: `${route} #${deleted.id}`, route, record: deleted });
 });
 
 // ----------------------

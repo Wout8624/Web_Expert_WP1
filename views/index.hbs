@@ -103,6 +103,19 @@
                             Run
                         </button>
                     </div>
+
+                    <div>
+                        <label for="delete-id-{{name}}" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Delete</label>
+                        <div class="flex flex-wrap gap-2">
+                            <select id="delete-id-{{name}}" data-route="{{name}}"
+                                    class="rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                            </select>
+                            <button type="button" data-route="{{name}}"
+                                    class="run-delete rounded-lg border border-rich-mahogany-500 bg-rich-mahogany-700/60 px-3 py-1.5 text-sm font-semibold text-soft-linen-50 transition hover:bg-rich-mahogany-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-soft-linen-300">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 </li>
             {{else}}
                 <li class="col-span-full rounded-xl border border-dashed border-soft-linen-800 p-8 text-center text-carbon-black-400">
@@ -188,6 +201,7 @@
     routeNames.forEach(async route => {
         const idSelect = document.getElementById(`id-${route}`);
         const putSelect = document.getElementById(`put-id-${route}`);
+        const deleteSelect = document.getElementById(`delete-id-${route}`);
 
         try {
             const res = await fetch(`/${route}`);
@@ -197,6 +211,7 @@
             data.forEach(item => {
                 idSelect.add(new Option(`#${item.id}`, item.id));
                 putSelect.add(new Option(`#${item.id}`, item.id));
+                deleteSelect.add(new Option(`#${item.id}`, item.id));
             });
 
             // Pre-fill the POST and PUT bodies with the first record
@@ -207,6 +222,7 @@
         } catch {
             idSelect.add(new Option('n/a', ''));
             putSelect.add(new Option('n/a', ''));
+            deleteSelect.add(new Option('n/a', ''));
         }
     });
 
@@ -262,6 +278,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: document.getElementById(`put-body-${route}`).value
             });
+        });
+    });
+
+    document.querySelectorAll('.run-delete').forEach(button => {
+        button.addEventListener('click', () => {
+            const { route } = button.dataset;
+            const id = document.getElementById(`delete-id-${route}`).value;
+
+            // Deleting writes to config.yaml, so ask first
+            if (!confirm(`Delete ${route} #${id}?`)) return;
+
+            run(`/${route}/${encodeURIComponent(id)}`, { method: 'DELETE' });
         });
     });
 </script>
