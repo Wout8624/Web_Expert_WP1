@@ -127,6 +127,61 @@ app.get('/:route/:id', checkRoute, (req, res) => {
 });
 
 // ----------------------
+// |       Post         |
+// ----------------------
+// Save to the YAML file
+function save() {
+  fs.writeFileSync(CONFIG, yaml.dump(config));
+}
+
+function nextId(route) {
+  const ids = (config[route] || []).map(item => item.id);
+  return ids.length === 0 ? 1 : Math.max(...ids) + 1;
+}
+
+// Checks every foreign id exists.
+// Returns a list of problems; an empty list means everything is fine.
+function findUnknownIds(route, newRecord) {
+  const problems = [];
+
+  for (const { relatedRoute, foreignKey } of config.relationships?.[route] || []) {
+    const existingIds = config[relatedRoute].map(item => item.id);
+
+    for (const id of newRecord[foreignKey] || []) {
+      if (!existingIds.includes(id)) {
+        problems.push(`${foreignKey}: no ${relatedRoute} with id ${id}`);
+      }
+    }
+  }
+
+  return problems;
+}
+
+app.post('/:route', checkRoute, (req, res) => {
+  const route = req.params.route;
+  const newRecord = req.body;
+
+  //check body is not empty
+  if (!newRecord || Object.keys(newRecord).length === 0) {
+    return res.status(400).json({ error: 'Request body is empty' });
+  }
+
+  // check if foreign relations are in order
+  const problems = findUnknownIds(route, newRecord);
+  if (problems.length > 0) {
+    return res.status(400).json({ error: 'Invalid links', problems });
+  }
+
+  const record = { ...newRecord, id: nextId(route) };
+  config[route] = config[route] || [];
+  config[route].push(record);
+  save();
+
+  // 4. Send the new record back (same shape as "get by id")
+  res.status(201).json({ title: `${route} #${record.id}`, route, record });
+});
+
+// ----------------------
 // |   Setup server     |
 // ----------------------
 const server = app.listen(PORT, () => {

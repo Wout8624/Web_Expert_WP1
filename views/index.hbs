@@ -80,6 +80,16 @@
                             </button>
                         </div>
                     </div>
+
+                    <div>
+                        <label for="body-{{name}}" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Create (POST)</label>
+                        <textarea id="body-{{name}}" data-route="{{name}}" rows="5" spellcheck="false"
+                                  class="body-input w-full rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">{}</textarea>
+                        <button type="button" data-route="{{name}}"
+                                class="run-post mt-2 rounded-lg bg-soft-linen-100 px-3 py-1.5 text-sm font-semibold text-carbon-black-900 transition hover:bg-soft-linen-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
+                            Run
+                        </button>
+                    </div>
                 </li>
             {{else}}
                 <li class="col-span-full rounded-xl border border-dashed border-soft-linen-800 p-8 text-center text-carbon-black-400">
@@ -96,7 +106,7 @@
         </div>
         <div class="overflow-hidden rounded-xl border border-soft-linen-800/60 bg-carbon-black-950/80 shadow-lg shadow-black/30">
             <div class="flex items-center gap-2 border-b border-soft-linen-900 px-4 py-2 text-xs">
-                <span class="rounded bg-soft-linen-900 px-1.5 py-0.5 font-mono font-semibold text-soft-linen-200">GET</span>
+                <span id="result-method" class="rounded bg-soft-linen-900 px-1.5 py-0.5 font-mono font-semibold text-soft-linen-200">GET</span>
                 <span id="result-status" class="font-mono"></span>
             </div>
             <pre id="result-body" class="max-h-[32rem] overflow-auto p-4 font-mono text-sm leading-relaxed text-soft-linen-100"></pre>
@@ -113,17 +123,19 @@
     const resultUrl = document.getElementById('result-url');
     const resultStatus = document.getElementById('result-status');
     const resultBody = document.getElementById('result-body');
+    const resultMethod = document.getElementById('result-method');
 
-    async function run(url) {
+    async function run(url, options = {}) {
         result.classList.remove('hidden');
         resultUrl.textContent = url;
         resultUrl.href = url;
+        resultMethod.textContent = options.method || 'GET';
         resultStatus.textContent = 'Loading…';
         resultStatus.className = 'font-mono text-soft-linen-400';
         resultBody.textContent = '';
 
         try {
-            const res = await fetch(url);
+            const res = await fetch(url, options);
             const text = await res.text();
             resultStatus.textContent = `${res.status} ${res.statusText}`;
             resultStatus.className = `font-mono ${res.ok ? 'text-soft-linen-200' : 'text-rich-mahogany-300'}`;
@@ -156,6 +168,12 @@
             const res = await fetch(`/${select.dataset.route}`);
             const { data } = await res.json();
             data.forEach(item => select.add(new Option(`#${item.id}`, item.id)));
+
+            // Pre-fill the POST body with the fields of an existing record (minus its id)
+            if (data.length > 0) {
+                const { id, ...template } = data[0];
+                document.getElementById(`body-${select.dataset.route}`).value = JSON.stringify(template, null, 2);
+            }
         } catch {
             select.add(new Option('n/a', ''));
         }
@@ -180,6 +198,17 @@
 
     document.querySelectorAll('.run-id').forEach(button => {
         button.addEventListener('click', () => run(buildUrl(button, true)));
+    });
+
+    document.querySelectorAll('.run-post').forEach(button => {
+        button.addEventListener('click', () => {
+            const { route } = button.dataset;
+            run(`/${route}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: document.getElementById(`body-${route}`).value
+            });
+        });
     });
 </script>
 </body>
