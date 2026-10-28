@@ -32,11 +32,13 @@ class DataService {
   }
 
   hasRoute(route) {
+    // check if route is in config
     return (this.config.routes || []).includes(route);
   }
 
 
   listRoutes() {
+    // list all routes in config
     return this.config.routes.map(r => ({ name: r, count: (this.config[r] || []).length }));
   }
 
@@ -182,6 +184,7 @@ class DataService {
   }
 
   embedRelation(route, record, embed) {
+    // from pets to persons
     const forward = (this.config.relationships?.[route] || [])
         .find(rel => rel.relatedRoute === embed);
 
@@ -193,6 +196,7 @@ class DataService {
       return { ...record, [embed]: related };
     }
 
+    // from persons to pets
     const reverse = (this.config.relationships?.[embed] || [])
         .find(rel => rel.relatedRoute === route);
 

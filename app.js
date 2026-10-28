@@ -38,7 +38,7 @@ function checkRoute(req, res, next) {
   next();
 }
 
-// Turns an error thrown by the service into a response
+// Turns error by service into response
 function sendError(res, error) {
   if (error instanceof NotFoundError) {
     return res.status(404).json({ title: '404 Not Found', error: error.message });
