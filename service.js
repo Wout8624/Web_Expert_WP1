@@ -43,11 +43,15 @@ class DataService {
   // ----------------------
   // |     Get all        |
   // ----------------------
-  getAll(route, embed) {
+  getAll(route, embed, sort, order) {
     let data = this.config[route] || [];
 
     if (embed) {
       data = data.map(item => this.embedRelation(route, item, embed));
+    }
+
+    if (sort) {
+      data = this.sortBy(data, sort, order);
     }
 
     return data;
@@ -134,6 +138,24 @@ class DataService {
       throw new NotFoundError(`Record with ID ${id} not found in ${route}`);
     }
     return index;
+  }
+
+  // Returns a sorted copy of the records, by one field.
+  // order is 'asc' (A → Z, default) or 'desc' (Z → A).
+  sortBy(records, field, order) {
+    const direction = order === 'desc' ? -1 : 1;
+
+    return [...records].sort((a, b) => {
+      // Text: alphabetical, ignoring upper/lower case ("cat" before "Python")
+      if (typeof a[field] === 'string' && typeof b[field] === 'string') {
+        return a[field].localeCompare(b[field], undefined, { sensitivity: 'base' }) * direction;
+      }
+
+      // Anything else (numbers): compare as before
+      if (a[field] < b[field]) return -1 * direction;
+      if (a[field] > b[field]) return 1 * direction;
+      return 0;
+    });
   }
 
   findRecord(route, id) {

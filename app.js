@@ -66,7 +66,8 @@ app.get('/', (req, res) => {
 // ----------------------------
 app.get('/:route', checkRoute, (req, res) => {
   const route = req.params.route;
-  const data = service.getAll(route, req.query._embed);
+  const { _embed, _sort, _order } = req.query;
+  const data = service.getAll(route, _embed, _sort, _order);
 
   res.json({
     title: route,

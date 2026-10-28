@@ -52,6 +52,17 @@
 
                     <div>
                         <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-soft-linen-500">Get all</p>
+                        <div class="mb-2 flex flex-wrap gap-2">
+                            <select id="sort-{{name}}" aria-label="Sort by"
+                                    class="rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                                <option value="">No sorting</option>
+                            </select>
+                            <select id="order-{{name}}" aria-label="Sort order"
+                                    class="rounded-lg border border-soft-linen-800 bg-carbon-black-950 px-2 py-1.5 font-mono text-sm text-soft-linen-100 focus:border-soft-linen-400 focus:outline-none">
+                                <option value="asc">asc</option>
+                                <option value="desc">desc</option>
+                            </select>
+                        </div>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" data-route="{{name}}"
                                     class="run-all rounded-lg bg-soft-linen-100 px-3 py-1.5 text-sm font-semibold text-carbon-black-900 transition hover:bg-soft-linen-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rich-mahogany-500">
@@ -208,6 +219,10 @@
             const { data } = await res.json();
             recordsByRoute[route] = data;
 
+            // Sort choices: every field name used by this route's records
+            const fields = new Set(data.flatMap(item => Object.keys(item)));
+            fields.forEach(field => document.getElementById(`sort-${route}`).add(new Option(field, field)));
+
             // Show the name, but keep the UUID as the option's value
             data.forEach(item => {
                 const label = item.name || item.id;
@@ -242,14 +257,24 @@
     function buildUrl(button, withId) {
         const { route, embed } = button.dataset;
         let url = `/${route}`;
+        const params = new URLSearchParams();
 
         if (withId) {
             url += `/${encodeURIComponent(document.getElementById(`id-${route}`).value)}`;
         }
         if (embed) {
-            url += `?_embed=${encodeURIComponent(document.getElementById(`embed-${route}`).value)}`;
+            params.set('_embed', document.getElementById(`embed-${route}`).value);
         }
-        return url;
+
+        // Sorting only applies to "Get all"
+        const sort = document.getElementById(`sort-${route}`).value;
+        if (!withId && sort) {
+            params.set('_sort', sort);
+            params.set('_order', document.getElementById(`order-${route}`).value);
+        }
+
+        // Only add the "?" when there is at least one parameter
+        return params.size > 0 ? `${url}?${params}` : url;
     }
 
     document.querySelectorAll('.run-all').forEach(button => {
